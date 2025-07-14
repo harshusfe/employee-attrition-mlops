@@ -22,4 +22,7 @@ stages:
     deps:
     - data/processed/processed.csv
     - models/model.pkl
+    - params.yaml
     - src/evaluate.py
+    outs:
+    - metrics/eval_metrics.json

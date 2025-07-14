@@ -25,17 +25,29 @@ stages:
       size: 498870
     - path: params.yaml
       hash: md5
-      md5: 94e283f7c6ced98575f4ced3d248f9f0
-      size: 63
+      md5: 77635d36071bad5a4fc4cf3bf06f90e0
+      size: 122
     - path: src/train.py
       hash: md5
-      md5: 28a27cd83eb04074430f04d81175db75
-      size: 1147
+      md5: 26b98d6081094da843afd70f79ee73b0
+      size: 1991
     outs:
+    - path: models/logistic_regression.pkl
+      hash: md5
+      md5: c2015bd78dda64b5dab5c906f5fa517d
+      size: 2335
     - path: models/model.pkl
       hash: md5
-      md5: e8d8ffda9a9ec79544eea4111a3a6541
-      size: 3780825
+      md5: 3467a202897460e172ecacb491d5f532
+      size: 3779865
+    - path: models/random_forest.pkl
+      hash: md5
+      md5: 3467a202897460e172ecacb491d5f532
+      size: 3779865
+    - path: models/svm.pkl
+      hash: md5
+      md5: c66a886a3cfc9816e8cc521ed374984b
+      size: 296235
   evaluate:
     cmd: python src/evaluate.py
     deps:
@@ -45,8 +57,8 @@ stages:
       size: 498870
     - path: models/model.pkl
       hash: md5
-      md5: e8d8ffda9a9ec79544eea4111a3a6541
-      size: 3780825
+      md5: 3467a202897460e172ecacb491d5f532
+      size: 3779865
     - path: src/evaluate.py
       hash: md5
       md5: 84879ea19d62b56d910442aea2484676
