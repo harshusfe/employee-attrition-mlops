@@ -59,7 +59,16 @@ stages:
       hash: md5
       md5: 3467a202897460e172ecacb491d5f532
       size: 3779865
+    - path: params.yaml
+      hash: md5
+      md5: 77635d36071bad5a4fc4cf3bf06f90e0
+      size: 122
     - path: src/evaluate.py
       hash: md5
-      md5: 84879ea19d62b56d910442aea2484676
-      size: 667
+      md5: 31387d767c259d509990e460685b5d91
+      size: 1581
+    outs:
+    - path: metrics/eval_metrics.json
+      hash: md5
+      md5: b8541257c9afac969b4f372654fe4857
+      size: 281
