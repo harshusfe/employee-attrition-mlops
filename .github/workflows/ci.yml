@@ -28,7 +28,7 @@ jobs:
         run: pytest tests/
 
       - name: 🐳 Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u harshitar24 --password-stdin
+        run: echo dckr_pat_GqpAVHYKIuMeZKbt5nbsaHyXqig | docker login -u harshitar24 --password-stdin
 
       - name: 🛠️ Build Docker image
         run: docker build -t harshitar24/attrition-api:latest .
