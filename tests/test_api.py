@@ -28,3 +28,6 @@ def test_prediction_endpoint():
     })
     assert response.status_code == 200
     assert "Attrition" in response.text
+
+
+
