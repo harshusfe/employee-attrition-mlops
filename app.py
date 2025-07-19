@@ -7,65 +7,134 @@ import numpy as np
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# Load your model
-model = joblib.load("models/model.pkl")  # Ensure correct path inside Docker
+# Load model
+model = joblib.load("models/model.pkl")
 
-# Helper functions for encoding
+# Predefined values for unused attributes
+PREDEFINED = {
+    "DailyRate": 800,
+    "DistanceFromHome": 5,
+    "EnvironmentSatisfaction": 3,
+    "JobInvolvement": 3,
+    "NumCompaniesWorked": 2,
+    "RelationshipSatisfaction": 3,
+    "StockOptionLevel": 1,
+    "TotalWorkingYears": 6,
+    "TrainingTimesLastYear": 2,
+    "WorkLifeBalance": 2,
+    "YearsInCurrentRole": 3,
+    "YearsWithCurrManager": 3,
+    "BusinessTravel": "Travel_Rarely",
+    "Department": "Research & Development",
+    "EducationField": "Life Sciences",
+    "JobRole": "Research Scientist"
+}
+
+#One-hot encoding helper
 def encode_inputs(form_data):
     categorical_options = {
-        "BusinessTravel": ["Travel_Frequently", "Travel_Rarely", "Non-Travel"],
-        "Department": ["Research & Development", "Sales", "Human Resources"],
-        "EducationField": ["Life Sciences", "Marketing", "Medical", "Other", "Technical Degree", "Human Resources"],
-        "Gender": ["Male", "Female"],
+        "BusinessTravel": ["Travel_Frequently", "Travel_Rarely"],
+        "Department": ["Research & Development", "Sales"],
+        "EducationField": ["Life Sciences", "Marketing", "Medical", "Other", "Technical Degree"],
+        "Gender": ["Male"],
         "JobRole": ["Human Resources", "Laboratory Technician", "Manager", "Manufacturing Director", 
                     "Research Director", "Research Scientist", "Sales Executive", "Sales Representative"],
-        "MaritalStatus": ["Married", "Single", "Divorced"],
-        "OverTime": ["Yes", "No"]
+        "MaritalStatus": ["Married", "Single"],
+        "OverTime": ["Yes"]
     }
 
-    encoded = []
+    input_vals = {
+        **form_data,
+        **PREDEFINED
+    }
 
-    # Numerical features
     num_fields = ["Age", "DailyRate", "DistanceFromHome", "Education", "EnvironmentSatisfaction",
                   "JobInvolvement", "JobLevel", "JobSatisfaction", "MonthlyIncome", "NumCompaniesWorked",
                   "PerformanceRating", "RelationshipSatisfaction", "StockOptionLevel", "TotalWorkingYears",
                   "TrainingTimesLastYear", "WorkLifeBalance", "YearsAtCompany", "YearsInCurrentRole",
                   "YearsWithCurrManager"]
-    for field in num_fields:
-        encoded.append(int(form_data[field]))
 
-    # One-hot encoding for categorical features
-    for cat in ["BusinessTravel", "Department", "EducationField", "Gender", "JobRole", "MaritalStatus", "OverTime"]:
+    encoded = [int(input_vals[f]) for f in num_fields]
+
+    for cat in categorical_options:
         options = categorical_options[cat]
-        for option in options:
-            encoded.append(1 if form_data[cat] == option else 0)
+        encoded += [1 if input_vals[cat] == opt else 0 for opt in options]
 
     return np.array([encoded])
+
+
+# def encode_inputs(form_data):
+#     categorical_options = {
+#         "BusinessTravel": ["Travel_Frequently", "Travel_Rarely"],
+#         "Department": ["Research & Development", "Sales"],
+#         "EducationField": ["Life Sciences", "Marketing", "Medical", "Other", "Technical Degree"],
+#         "Gender": ["Male"],
+#         "JobRole": ["Human Resources", "Laboratory Technician", "Manager", "Manufacturing Director", 
+#                     "Research Director", "Research Scientist", "Sales Executive", "Sales Representative"],
+#         "MaritalStatus": ["Married", "Single"],
+#         "OverTime": ["Yes"]
+#     }
+
+#     input_vals = {
+#         **form_data,
+#         **PREDEFINED
+#     }
+
+#     num_fields = ["Age", "DailyRate", "DistanceFromHome", "Education", "EnvironmentSatisfaction",
+#                   "JobInvolvement", "JobLevel", "JobSatisfaction", "MonthlyIncome", "NumCompaniesWorked",
+#                   "PerformanceRating", "RelationshipSatisfaction", "StockOptionLevel", "TotalWorkingYears",
+#                   "TrainingTimesLastYear", "WorkLifeBalance", "YearsAtCompany", "YearsInCurrentRole",
+#                   "YearsWithCurrManager"]
+
+#     feature_names = []
+#     encoded_values = []
+
+#     for f in num_fields:
+#         feature_names.append(f)
+#         encoded_values.append(int(input_vals[f]))
+
+#     for cat in categorical_options:
+#         for opt in categorical_options[cat]:
+#             col_name = f"{cat}_{opt}"
+#             feature_names.append(col_name)
+#             encoded_values.append(1 if input_vals[cat] == opt else 0)
+
+#     return np.array([encoded_values]), feature_names
 
 
 @app.get("/", response_class=HTMLResponse)
 def form_page(request: Request):
     return templates.TemplateResponse("form.html", {"request": request})
 
-
 @app.post("/predict", response_class=HTMLResponse)
 def predict_attrition(request: Request,
-    Age: int = Form(...), DailyRate: int = Form(...), DistanceFromHome: int = Form(...),
-    Education: int = Form(...), EnvironmentSatisfaction: int = Form(...),
-    JobInvolvement: int = Form(...), JobLevel: int = Form(...), JobSatisfaction: int = Form(...),
-    MonthlyIncome: int = Form(...), NumCompaniesWorked: int = Form(...), PerformanceRating: int = Form(...),
-    RelationshipSatisfaction: int = Form(...), StockOptionLevel: int = Form(...),
-    TotalWorkingYears: int = Form(...), TrainingTimesLastYear: int = Form(...),
-    WorkLifeBalance: int = Form(...), YearsAtCompany: int = Form(...),
-    YearsInCurrentRole: int = Form(...), YearsWithCurrManager: int = Form(...),
-    BusinessTravel: str = Form(...), Department: str = Form(...),
-    EducationField: str = Form(...), Gender: str = Form(...), JobRole: str = Form(...),
-    MaritalStatus: str = Form(...), OverTime: str = Form(...)
+    Age: int = Form(...),
+    MonthlyIncome: int = Form(...),
+    Gender: str = Form(...),
+    Education: int = Form(...),
+    YearsAtCompany: int = Form(...),
+    PerformanceRating: int = Form(...),
+    JobLevel: int = Form(...),
+    JobSatisfaction: int = Form(...),
+    OverTime: str = Form(...),
+    MaritalStatus: str = Form(...)
 ):
-    form_data = locals()
-    form_data.pop("request")
-    input_data = encode_inputs(form_data)
-    prediction = model.predict(input_data)[0]
+    form_data = {
+        "Age": Age,
+        "MonthlyIncome": MonthlyIncome,
+        "Gender": Gender,
+        "Education": Education,
+        "YearsAtCompany": YearsAtCompany,
+        "PerformanceRating": PerformanceRating,
+        "JobLevel": JobLevel,
+        "JobSatisfaction": JobSatisfaction,
+        "OverTime": OverTime,
+        "MaritalStatus": MaritalStatus
+    }
 
+    input_data = encode_inputs(form_data)
+
+
+    prediction = model.predict(input_data)[0]
     result_text = "Attrition: YES" if prediction == 1 else "Attrition: NO"
     return templates.TemplateResponse("form.html", {"request": request, "result": result_text})
