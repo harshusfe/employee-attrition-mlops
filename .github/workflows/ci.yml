@@ -28,10 +28,10 @@ jobs:
         run: pytest tests/
 
       - name: 🐳 Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u harshitar24 --password-stdin
 
       - name: 🛠️ Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/attrition-api:latest .
+        run: docker build -t harshitar24/attrition-api:latest .
 
       - name: 🚀 Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/attrition-api:latest
+        run: docker push harshitar24/attrition-api:latest
