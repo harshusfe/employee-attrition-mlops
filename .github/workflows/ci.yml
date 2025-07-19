@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '**'  # Trigger on push to any branch
+    tags:
+      - 'v*'  # Also triggers on version tags like v1.0.0
 
 jobs:
   build-and-push:
@@ -30,8 +32,22 @@ jobs:
       - name: 🐳 Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u harshitar24 --password-stdin
 
-      - name: 🛠️ Build Docker image
-        run: docker build -t harshitar24/attrition-api:latest .
+      - name: 🔖 Set image version
+        id: set-version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: 🚀 Push Docker image to Docker Hub
-        run: docker push harshitar24/attrition-api:latest
+      - name: 🛠️ Build Docker image
+        run: |
+          docker build -t harshitar24/employee-attrition-app:${{ env.VERSION }} \
+                       -t harshitar24/employee-attrition-app:latest .
+
+      - name: 🚀 Push Docker images
+        run: |
+          docker push harshitar24/employee-attrition-app:${{ env.VERSION }}
+          docker push harshitar24/employee-attrition-app:latest
