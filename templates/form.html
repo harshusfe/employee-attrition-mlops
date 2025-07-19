@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attrition Predictor</title>
+</head>
+<body>
+    <h1>Employee Attrition Prediction</h1>
+    <form method="post" action="/predict">
+        {% set num_fields = ['Age', 'DailyRate', 'DistanceFromHome', 'Education', 'EnvironmentSatisfaction', 
+                             'JobInvolvement', 'JobLevel', 'JobSatisfaction', 'MonthlyIncome', 'NumCompaniesWorked',
+                             'PerformanceRating', 'RelationshipSatisfaction', 'StockOptionLevel', 'TotalWorkingYears',
+                             'TrainingTimesLastYear', 'WorkLifeBalance', 'YearsAtCompany', 'YearsInCurrentRole',
+                             'YearsWithCurrManager'] %}
+        {% for field in num_fields %}
+            <label>{{ field.replace("_", " ") }}:</label>
+            <input type="number" name="{{ field }}" required><br><br>
+        {% endfor %}
+
+        <label>Business Travel:</label>
+        <select name="BusinessTravel">
+            <option>Travel_Frequently</option>
+            <option>Travel_Rarely</option>
+            <option>Non-Travel</option>
+        </select><br><br>
+
+        <label>Department:</label>
+        <select name="Department">
+            <option>Research & Development</option>
+            <option>Sales</option>
+            <option>Human Resources</option>
+        </select><br><br>
+
+        <label>Education Field:</label>
+        <select name="EducationField">
+            <option>Life Sciences</option>
+            <option>Marketing</option>
+            <option>Medical</option>
+            <option>Other</option>
+            <option>Technical Degree</option>
+            <option>Human Resources</option>
+        </select><br><br>
+
+        <label>Gender:</label>
+        <select name="Gender">
+            <option>Male</option>
+            <option>Female</option>
+        </select><br><br>
+
+        <label>Job Role:</label>
+        <select name="JobRole">
+            <option>Human Resources</option>
+            <option>Laboratory Technician</option>
+            <option>Manager</option>
+            <option>Manufacturing Director</option>
+            <option>Research Director</option>
+            <option>Research Scientist</option>
+            <option>Sales Executive</option>
+            <option>Sales Representative</option>
+        </select><br><br>
+
+        <label>Marital Status:</label>
+        <select name="MaritalStatus">
+            <option>Married</option>
+            <option>Single</option>
+            <option>Divorced</option>
+        </select><br><br>
+
+        <label>OverTime:</label>
+        <select name="OverTime">
+            <option>Yes</option>
+            <option>No</option>
+        </select><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if result %}
+        <h2>{{ result }}</h2>
+    {% endif %}
+</body>
+</html>
